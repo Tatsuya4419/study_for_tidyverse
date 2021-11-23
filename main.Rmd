@@ -1,0 +1,99 @@
+---
+title: "Study for Tidyverse"
+output: 
+  html_document:
+    theme: cerulean
+    # df_print: paged
+    toc: true
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+```{r}
+df <- tibble(
+  A = c(1, 2, 3),
+  B = c(4 ,5, 6),
+  C = c(7, 8, 9)
+  )
+df
+```
+
+### map系関数の中で列名を参照する
+
+```{r}
+df %>%
+  map2_df(., names(.), ~paste0(.x, .y))
+```
+
+### 行ごとに演算
+
+このようにすると全要素を計算に使ってしまう。
+
+```{r}
+df %>% 
+  rowwise() %>% 
+  mutate(sum = sum(.))
+```
+
+`across()`関数を使うと行ごとの処理になる。
+
+```{r}
+df %>% 
+  rowwise() %>% 
+  mutate(sum = sum(across()))
+```
+
+`pmap()`でも同じことができる。
+
+```{r}
+df %>% 
+  mutate(sum = pmap_dbl(., sum))
+```
+
+### 特定の列に対して関数を適用
+
+formulaを使うことでシンプルに記述できる。
+
+```{r}
+df %>%
+  mutate_at(vars(-A), ~ . + A)
+```
+
+```{r}
+df %>% 
+  mutate(
+    across(-A, ~ . + A)
+  )
+```
+
+### Tidy Evaluation
+
+<https://dplyr.tidyverse.org/articles/programming.html>
+
+NSEによる変数指定に環境変数を使いたいときの方法いろいろ。
+
+```{r}
+cols <- c("A", "B")
+
+df %>% 
+  group_by(across(all_of(cols)))
+```
+
+```{r}
+col <- "A"
+
+df %>% 
+  filter(.data[[col]] > 1)
+```
+
+```{r}
+col <- "D"
+
+df %>% 
+  mutate({{col}} := C + 3)
+```
