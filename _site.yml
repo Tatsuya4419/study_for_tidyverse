@@ -1,0 +1,10 @@
+name: "Study for Tidyverse"
+output: 
+  html_document:
+    theme: cerulean
+    # df_print: paged
+    toc: true
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+output_dir: "docs"
